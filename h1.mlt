@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<mlt LC_NUMERIC="C" version="7.13.0" title="Shotcut version 22.11.25">
+  <profile description="automatic" width="1280" height="720" progressive="1" sample_aspect_num="1" sample_aspect_den="1" display_aspect_num="16" display_aspect_den="9" frame_rate_num="30000" frame_rate_den="1001" colorspace="709"/>
+  <chain id="chain0" title="Shotcut version 22.11.25" in="00:01:57.257" out="00:03:11.345">
+    <property name="length">00:07:30.597</property>
+    <property name="eof">pause</property>
+    <property name="resource">/home/galaxy/Downloads/Super Meat Boy - 100% Walkthrough - Part 1 - The Forest.mp4</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="creation_time">2016-08-14T16:11:46</property>
+    <property name="shotcut:hash">0ee770d95680e8e2eecbb56c5c0fb935</property>
+    <property name="ignore_points">0</property>
+    <property name="shotcut:caption">Super Meat Boy - 100% Walkthrough - Part 1 - The Forest.mp4</property>
+    <property name="shotcut:projectAudioChannels">2</property>
+    <property name="shotcut:projectFolder">0</property>
+  </chain>
+</mlt>
