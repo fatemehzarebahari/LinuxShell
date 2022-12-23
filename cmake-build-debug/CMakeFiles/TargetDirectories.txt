@@ -1,0 +1,3 @@
+/home/galaxy/Documents/LinuxShell/cmake-build-debug/CMakeFiles/Documents.dir
+/home/galaxy/Documents/LinuxShell/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/galaxy/Documents/LinuxShell/cmake-build-debug/CMakeFiles/rebuild_cache.dir
