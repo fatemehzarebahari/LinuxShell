@@ -1,17 +1,16 @@
-
 #include <stdio.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include<readline/history.h>
-#include <readline/readline.h>
+// #include<readline/history.h>
+//  #include <readline/readline.h>
 
 #define MAXLIST 100
 
 char TEdir[200];
-char Hidir[200];
 char Hi2dir[200];
+int itsLinux=1;
 
 void trimtrailing(char *s)
 {
@@ -25,11 +24,62 @@ void trimtrailing(char *s)
     }
     s[i+1]='\0';
 }
-void addToHistory(char* str){
-//    char *argv[] = {   str,Hi2dir, 0 };
-//    execv(Hidir,argv);
-    FILE *file = fopen(Hi2dir,"w");
-    fprintf(file,"%s",str);
+void removeSpacesFromStr(char *string)
+{
+    int non_space_count = 0;
+
+    for (int i = 0; string[i] != '\0'; i++)
+    {
+        if (string[i] != ' ')
+        {
+            string[non_space_count] = string[i];
+            non_space_count++;
+        }
+    }
+    string[non_space_count] = '\0';
+}
+void addToHistory(char *str){
+
+    FILE *file = fopen(Hi2dir,"r+");
+    //checking
+    if(file==NULL){
+        printf(stderr,"\nhistory file not founded!");
+        return ;
+    }
+
+    char line[50][200];
+    int linCounter=0;
+    // history
+    while(fgets(line[linCounter],sizeof(line),file)){
+        linCounter++;
+    }
+    fclose(file);
+    file = fopen(Hi2dir,"w");
+
+    fputs(str,file);
+    fputs("\n",file);
+
+    for(int i=0;i<linCounter;i++){
+        fputs(line[i],file);
+
+    }
+    fclose(file);
+}
+void showHistory(){
+    FILE *file = fopen(Hi2dir,"r");
+    //checking
+    if(file==NULL){
+        printf(stderr,"\nhistory file not founded!");
+        return ;
+    }
+
+    char line[200];
+
+    //printing history
+    while(fgets(line,sizeof(line),file)){
+        printf("%s",line);
+    }
+    fclose(file);
 }
 
 int readLine(char* str){
@@ -40,7 +90,6 @@ int readLine(char* str){
     if (strlen(buf) != 0) {
         strcpy(str, buf);
         trimtrailing(str);
-        addToHistory(str);
         free(buf);
         return 0;
     } else {
@@ -77,34 +126,76 @@ void parseArgs(char *str,char** args){
         token = strtok(NULL," ");
         i++;
     }
-
 }
-
-void printPrompt(){
-    int addressSize  = 2048;
-    char address[addressSize];
-    getcwd(address, addressSize);
-    printf("%s-->", address);
-}
+//int parsePipes(char* str,char** args){
+//    int i = 0;
+//    char arr[MAXLIST];
+//    while(i< MAXLIST){
+//        arr[i++] = *str;
+//        str++;
+//    }
+//    char *token = strtok(arr,"|");
+//    if(strlen(token)< strlen(arr))
+//        return 1;
+//    i = 0;
+//    while(i<MAXLIST){
+//        args[i] = token;
+//        if (args[i] == NULL)
+//            break;
+//        token = strtok(NULL," ");
+//        i++;
+//    }
+//    return 0;
+//}
+//void executePipe(){
+//    int fd[2];
+//    if(pipe(fd)==-1)
+//        fprintf( stderr,"failed to create pipe\n");
+//    int pid1 = fork();
+//    if(pid1<0){}
+//    if(pid1==0){
+//        dup2(fd[1],STDOUT_FILENO);
+//        close(fd[0]);
+//        close(fd[1]);
+//
+//    }
+//}
 void execute(char* command, char** args){
+
+//    int
+    //text edit commands
     if(!strcmp("a",command)||!strcmp("b",command)||!strcmp("c",command)||
        !strcmp("d",command)||!strcmp("f",command)||!strcmp("g",command)){
-//        printf(TEdir);
+
         char pathCopy[200];
         strcpy(pathCopy,TEdir);
         strcat(pathCopy,command);
-        strcat(pathCopy,".out");
+        if(itsLinux){
+            strcat(pathCopy,".out");
+        }
         int filePathSize  = 1024;
         char filePath[filePathSize];
         getcwd(filePath, filePathSize);
         strcat(filePath,"/");
         strcat(filePath,args[1]);
-//        puts(filePath);
         char *argv[] = {   filePath, 0 };
-
-        execv(pathCopy,argv);
+        pid_t pid;
+        pid = fork();
+        if (pid == -1) {
+//            stderr("");
+        }
+        if (pid == 0) {
+            if(execv(pathCopy,argv)<0)
+            fprintf( stderr,"couldn't execute command\n");
+        } else
+            waitpid(pid, 0, 0);
     }
-    if(strcmp("cd",command) == 0){
+
+    //history command
+    else if(!strcmp("his",command)){
+        showHistory();
+    }
+    else if(strcmp("cd",command) == 0){
         chdir(args[1]);
     }
     else {
@@ -114,9 +205,8 @@ void execute(char* command, char** args){
             fprintf( stderr,"failed to fork");
         }
         if (pid == 0) {
-            if(execvp(command, args)<0){
-                fprintf( stderr,"command doesn't exist\n");
-            }
+            if(execvp(command, args)<0);
+                fprintf( stderr,"couldn't execute command\n");
             exit(0);
         } else
             waitpid(pid, 0, 0);
@@ -126,14 +216,26 @@ void execute(char* command, char** args){
 }
 
 
+void printPrompt(){
+    int addressSize  = 1024;
+    char address[addressSize];
+    getcwd(address, addressSize);
+    printf("%s>>>", address);
+}
+
 void directorySetUp(){
-    chdir("..");
+    if(itsLinux){
+        chdir("..");
+    }
+
     getcwd(TEdir,sizeof(TEdir));
-    strcpy(Hidir,TEdir);
     strcpy(Hi2dir,TEdir);
     strcat(TEdir,"/textEditor/");
-    strcat(Hidir,"/history/a.out");
     strcat(Hi2dir,"/history/history.txt");
+    //clear history file
+    FILE *file = fopen(Hi2dir,"w");
+    fprintf(file,"");
+    fclose(file);
 }
 int main() {
 
@@ -151,5 +253,4 @@ int main() {
     }
     return 0;
 }
-
 
