@@ -1,2 +1,4 @@
-ls -l sort
-l
+ls -l | head -5
+ls | wc -l
+ls | wc -c
+ls | sort

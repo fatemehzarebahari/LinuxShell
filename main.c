@@ -24,20 +24,6 @@ void trimtrailing(char *s)
     }
     s[i+1]='\0';
 }
-void removeSpacesFromStr(char *string)
-{
-    int non_space_count = 0;
-
-    for (int i = 0; string[i] != '\0'; i++)
-    {
-        if (string[i] != ' ')
-        {
-            string[non_space_count] = string[i];
-            non_space_count++;
-        }
-    }
-    string[non_space_count] = '\0';
-}
 void addToHistory(char *str){
 
     FILE *file = fopen(Hi2dir,"r+");
@@ -127,42 +113,31 @@ void parseArgs(char *str,char** args){
         i++;
     }
 }
-//int parsePipes(char* str,char** args){
-//    int i = 0;
-//    char arr[MAXLIST];
-//    while(i< MAXLIST){
-//        arr[i++] = *str;
-//        str++;
-//    }
-//    char *token = strtok(arr,"|");
-//    if(strlen(token)< strlen(arr))
-//        return 1;
-//    i = 0;
-//    while(i<MAXLIST){
-//        args[i] = token;
-//        if (args[i] == NULL)
-//            break;
-//        token = strtok(NULL," ");
-//        i++;
-//    }
-//    return 0;
-//}
-//void executePipe(){
-//    int fd[2];
-//    if(pipe(fd)==-1)
-//        fprintf( stderr,"failed to create pipe\n");
-//    int pid1 = fork();
-//    if(pid1<0){}
-//    if(pid1==0){
-//        dup2(fd[1],STDOUT_FILENO);
-//        close(fd[0]);
-//        close(fd[1]);
-//
-//    }
-//}
+int parsePipes(char* str,char** pipedArgs){
+    int i = 0;
+    char arr[MAXLIST];
+    int length = strlen(str);
+    while(i< MAXLIST){
+        arr[i++] = *str;
+        str++;
+    }
+    char *token = strtok(arr,"|");
+    printf("%S",token);
+    if(strlen(token)==length)
+        return 1;
+    i = 0;
+    while(i<MAXLIST){
+        pipedArgs[i] = token;
+        if (pipedArgs[i] == NULL)
+            break;
+        token = strtok(NULL,"|");
+        i++;
+    }
+
+    return 0;
+}
 void execute(char* command, char** args){
 
-//    int
     //text edit commands
     if(!strcmp("a",command)||!strcmp("b",command)||!strcmp("c",command)||
        !strcmp("d",command)||!strcmp("f",command)||!strcmp("g",command)){
@@ -215,7 +190,41 @@ void execute(char* command, char** args){
 
 }
 
+void executePipe(char** pipeArgs){
+    char* args[MAXLIST];
+//    parseArgs(pipeArgs[0],args);
+//    execute(args[0],args);
+    int fd[2];
+    if(pipe(fd)==-1)
+        fprintf( stderr,"failed to create pipe\n");
+    int pid1 = fork();
+    if(pid1<0){}
+    if(pid1==0){
+        dup2(fd[1],STDOUT_FILENO);
+        close(fd[0]);
+        close(fd[1]);
+        parseArgs(pipeArgs[0],args);
+        execute(args[0],args);
+        exit(0);
 
+    }
+    int pid2 = fork();
+    if(pid2<0){}
+    if(pid2==0){
+        dup2(fd[0],STDIN_FILENO);
+        close(fd[0]);
+        close(fd[1]);
+        parseArgs(pipeArgs[1],args);
+        execute(args[0],args);
+        exit(0);
+    }
+    close(fd[0]);
+    close(fd[1]);
+
+    waitpid(pid1,NULL,0);
+    waitpid(pid2,NULL,0);
+
+}
 void printPrompt(){
     int addressSize  = 1024;
     char address[addressSize];
@@ -241,6 +250,7 @@ int main() {
 
     directorySetUp();
     char* args[MAXLIST];
+    char* pipeArgs[MAXLIST];
     char str[MAXLIST];
 
 
@@ -248,8 +258,13 @@ int main() {
         printPrompt();
         readLine(str);
         addToHistory(str);
-        parseArgs(str,args);
-        execute(args[0],args);
+        if(parsePipes(str,pipeArgs) == 1) {
+            parseArgs(str, args);
+            execute(args[0],args);
+        }
+        else{
+            executePipe(pipeArgs);
+        }
     }
     return 0;
 }
