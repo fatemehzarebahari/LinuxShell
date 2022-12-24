@@ -5,7 +5,7 @@ int main(  int args ,char **path ){
 
    //checking 
    if(file==NULL){
-      printf("\nfile not founded!\n");
+      fprintf(stderr,"no such file or directory: %s",path[0]);
       return 1;
    }
 
