@@ -1,4 +1,4 @@
-ls -l | head -5
-ls | wc -l
-ls | wc -c
-ls | sort
+his
+ls -l | head -4
+ls -l
+ls

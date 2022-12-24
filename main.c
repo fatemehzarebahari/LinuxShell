@@ -71,7 +71,7 @@ void showHistory(){
 int readLine(char* str){
     int n = MAXLIST;
     char * buf = malloc(sizeof(char) * n);
-    getline(&buf, &n, stdin);
+    getline(&buf,&n, stdin);
 
     if (strlen(buf) != 0) {
         strcpy(str, buf);
@@ -157,7 +157,7 @@ void execute(char* command, char** args){
         pid_t pid;
         pid = fork();
         if (pid == -1) {
-//            stderr("");
+            fprintf( stderr,"failed to fork");
         }
         if (pid == 0) {
             if(execv(pathCopy,argv)<0)
@@ -180,7 +180,7 @@ void execute(char* command, char** args){
             fprintf( stderr,"failed to fork");
         }
         if (pid == 0) {
-            if(execvp(command, args)<0);
+            if(execvp(command, args)<0)
                 fprintf( stderr,"couldn't execute command\n");
             exit(0);
         } else
@@ -192,13 +192,14 @@ void execute(char* command, char** args){
 
 void executePipe(char** pipeArgs){
     char* args[MAXLIST];
-//    parseArgs(pipeArgs[0],args);
-//    execute(args[0],args);
+
     int fd[2];
     if(pipe(fd)==-1)
         fprintf( stderr,"failed to create pipe\n");
     int pid1 = fork();
-    if(pid1<0){}
+    if(pid1<0){
+        fprintf( stderr,"failed to fork");
+    }
     if(pid1==0){
         dup2(fd[1],STDOUT_FILENO);
         close(fd[0]);
@@ -209,7 +210,9 @@ void executePipe(char** pipeArgs){
 
     }
     int pid2 = fork();
-    if(pid2<0){}
+    if(pid2<0){
+        fprintf( stderr,"failed to fork");
+    }
     if(pid2==0){
         dup2(fd[0],STDIN_FILENO);
         close(fd[0]);
