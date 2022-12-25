@@ -1,4 +1,4 @@
-his
-ls -l | head -4
-ls -l
+a textFile.txt
+ls
+cd testFiles
 ls

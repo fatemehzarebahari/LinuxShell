@@ -10,7 +10,7 @@
 
 char TEdir[200];
 char Hi2dir[200];
-int itsLinux=1;
+int itsLinux=0;
 
 void trimtrailing(char *s)
 {

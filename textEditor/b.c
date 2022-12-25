@@ -16,7 +16,7 @@ int main(int args,char **path)
       
     //If file doesn't exist  
     if (file == NULL){  
-        printf("File not found");  
+        fprintf(stderr,"no such file or directory: %s",path[0]);
         return(1);
     }  
       

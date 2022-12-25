@@ -9,7 +9,7 @@ int main(int args, char *path[] ){
    FILE *file = fopen(path[0],"r");
    //checking 
    if(file==NULL){
-      printf("\nfile not founded!");
+      fprintf(stderr,"no such file or directory: %s",path[0]);
       return 1;
    }
 
