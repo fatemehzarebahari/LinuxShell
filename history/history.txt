@@ -1,4 +1,14 @@
-a textFile.txt
-ls
+his | head -5
+his
+g textFile2.txt
+f textFile2.txt
+c textFile1.txt
+b textFile1.txt
+b textFIle1.txt
+b textFile2.txt
+a textFile2.txt | head -3
+a textFile2.txt | head -3
 cd testFiles
+ls -l | sort
+pwd
 ls
