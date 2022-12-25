@@ -2,8 +2,10 @@
 
 # here are the commands that we support:
 ## commands that our shell support:
-1- all linux shell commands
+1- all linux shell commands 
+
 2- pipe commands with only two pipes are 
+
 3- there are some text editing commands as followed:
 
 	1. a -textFile name- : it it returns the first part of each line of the textFile
